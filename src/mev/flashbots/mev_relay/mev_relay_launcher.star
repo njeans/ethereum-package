@@ -79,12 +79,12 @@ def launch_mev_relay(
     image = ImageBuildSpec(
         # Name to give built image
         # MANDATORY
-        image_name="kushalbabel/prof",
+        image_name="prof-project/prof-relay",
         
         # Locator to build context within the Kurtosis package
         # As of now, Kurtosis expects a Dockerfile at the root of the build context
         # MANDATORY
-        build_context_dir="/prof"
+        build_context_dir="/prof-relay"
     )
 
     env_vars = {
