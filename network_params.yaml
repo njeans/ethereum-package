@@ -54,6 +54,7 @@ network_params:
   ejection_balance: 16000000000
   capella_fork_epoch: 0
   deneb_fork_epoch: 4
+  timeout: 40m
   electra_fork_epoch: null
   network: kurtosis
   min_validator_withdrawability_delay: 256

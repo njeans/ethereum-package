@@ -214,7 +214,7 @@ def run(plan, args={}):
             field="extract.epoch",
             assertion=">=",
             target_value=str(network_params.capella_fork_epoch),
-            timeout="20m",
+            timeout=str(network_params.timeout),
             service_name=first_client_beacon_name,
         )
         endpoint = mev_relay.launch_mev_relay(
