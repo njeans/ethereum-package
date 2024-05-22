@@ -59,9 +59,9 @@ participants:
     snooper_enabled: false
     ethereum_metrics_exporter_enabled: false
     xatu_sentry_enabled: false
-    prometheus_config:
-      scrape_interval: 15s
-      labels: {}
+    # prometheus_config:
+    #   scrape_interval: 15s
+    #   labels: {}
     blobber_enabled: false
     blobber_extra_params: []
     builder_network_params: null
@@ -70,7 +70,7 @@ network_params:
   network: kurtosis
   network_id: "3151908"
   deposit_contract_address: "0x4242424242424242424242424242424242424242"
-  seconds_per_slot: 12
+  seconds_per_slot: 2
   num_validator_keys_per_node: 64
   preregistered_validator_keys_mnemonic:
     "giant issue aisle success illegal bike spike
@@ -85,59 +85,25 @@ network_params:
   eth1_follow_distance: 2048
   min_validator_withdrawability_delay: 256
   shard_committee_period: 256
-  deneb_fork_epoch: 0
-  electra_fork_epoch: 100000000
-  fulu_fork_epoch: 100000001
-  eip7594_fork_epoch: 100000002
-  eip7594_fork_version: "0x60000038"
-  network_sync_base_url: https://snapshots.ethpandaops.io/
-  data_column_sidecar_subnet_count: 128
-  samples_per_slot: 8
-  custody_requirement: 4
-  max_blobs_per_block: 6
-  additional_preloaded_contracts: {}
-  devnet_repo: ethpandaops
-  prefunded_accounts: {}
-additional_services: []
-dora_params:
-  image: ""
-tx_spammer_params:
-  tx_spammer_extra_args: []
-goomy_blob_params:
-  goomy_blob_args: []
-prometheus_params:
-  storage_tsdb_retention_time: "1d"
-  storage_tsdb_retention_size: "512MB"
-  min_cpu: 10
-  max_cpu: 1000
-  min_mem: 128
-  max_mem: 2048
-grafana_params:
-  additional_dashboards: []
-  min_cpu: 10
-  max_cpu: 1000
-  min_mem: 128
-  max_mem: 2048
-assertoor_params:
-  image: ""
-  run_stability_check: false
-  run_block_proposal_check: false
-  run_transaction_test: false
-  run_blob_transaction_test: false
-  run_opcodes_transaction_test: false
-  run_lifecycle_test: false
-  tests: []
+
+additional_services:
+  - tx_spammer
+  - blob_spammer
+  - el_forkmon
+  # - beacon_metrics_gazer
+  - dora
+  # - prometheus_grafana
 wait_for_finalization: false
 global_log_level: info
 snooper_enabled: false
 ethereum_metrics_exporter_enabled: false
 parallel_keystore_generation: false
 disable_peer_scoring: false
+mev_type: flashbots
 persistent: false
-mev_type: null
 mev_params:
-  mev_relay_image: flashbots/mev-boost-relay
-  mev_builder_image: ethpandaops/flashbots-builder:main
+  mev_builder_image: prof-project/builder-prof-merger
+  # mev_relay_image: flashbots/mev-boost-relay
   mev_builder_cl_image: sigp/lighthouse:latest
   mev_boost_image: flashbots/mev-boost
   mev_boost_args: ["mev-boost", "--relay-check"]
@@ -145,14 +111,15 @@ mev_params:
   mev_relay_housekeeper_extra_args: []
   mev_relay_website_extra_args: []
   mev_builder_extra_args: []
-  mev_builder_prometheus_config:
-    scrape_interval: 15s
-    labels: {}
+  # mev_builder_prometheus_config:
+  #   scrape_interval: 15s
+  #   labels: {}
   mev_flood_image: flashbots/mev-flood
   mev_flood_extra_args: []
-  mev_flood_seconds_per_bundle: 15
-  custom_flood_params:
-    interval_between_transactions: 1
+  mev_flood_seconds_per_bundle: 1
+  mev_boost_image: flashbots/mev-boost
+  mev_boost_args: ["mev-boost", "--relay-check"]
+persistent: false
 xatu_sentry_enabled: false
 xatu_sentry_params:
   xatu_sentry_image: ethpandaops/xatu-sentry
