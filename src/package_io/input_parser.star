@@ -384,6 +384,11 @@ def input_parser(plan, input_args):
             dockerhub_prefix=result["docker_cache_params"]["dockerhub_prefix"],
             github_prefix=result["docker_cache_params"]["github_prefix"],
             google_prefix=result["docker_cache_params"]["google_prefix"],
+            prof_sequencer_image=result["mev_params"]["prof_sequencer_image"],
+            prof_sequencer_extra_args=result["mev_params"]["prof_sequencer_extra_args"],
+            prof_sequencer_seconds_per_bundle=result["mev_params"][
+                "prof_sequencer_seconds_per_bundle"
+            ],
         ),
         tx_spammer_params=struct(
             image=result["tx_spammer_params"]["image"],

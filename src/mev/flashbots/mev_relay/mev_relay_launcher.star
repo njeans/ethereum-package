@@ -150,7 +150,7 @@ def launch_mev_relay(
             + mev_params.mev_relay_api_extra_args,
             ports={
                 "api": PortSpec(
-                    number=MEV_RELAY_ENDPOINT_PORT, transport_protocol="TCP"
+                    number=MEV_RELAY_ENDPOINT_PORT, transport_protocol="TCP", application_protocol = "http"
                 )
             },
             env_vars=env_vars,

@@ -53,6 +53,7 @@ flashbots_mev_relay = import_module(
 )
 mock_mev = import_module("./src/mev/flashbots/mock_mev/mock_mev_launcher.star")
 mev_flood = import_module("./src/mev/flashbots/mev_flood/mev_flood_launcher.star")
+prof_sequencer = import_module("./src/mev/prof_sequencer/prof_sequencer_launcher.star")
 mev_custom_flood = import_module(
     "./src/mev/flashbots/mev_custom_flood/mev_custom_flood_launcher.star"
 )
@@ -284,6 +285,15 @@ def run(plan, args={}):
             normal_user.private_key,
             global_node_selectors,
         )
+        prof_contract_owner, prof_normal_user = genesis_constants.PRE_FUNDED_ACCOUNTS[8:10]
+        prof_sequencer.launch_prof_sequencer(
+            plan,
+            mev_params.prof_sequencer_image,
+            fuzz_target,
+            prof_contract_owner.private_key,
+            prof_normal_user.private_key,
+            global_node_selectors,
+        )
         epoch_recipe = GetHttpRequestRecipe(
             endpoint="/eth/v2/beacon/blocks/head",
             port_id=HTTP_PORT_ID_FOR_FACT,
@@ -331,6 +341,14 @@ def run(plan, args={}):
             mev_params.mev_flood_seconds_per_bundle,
             contract_owner.private_key,
             normal_user.private_key,
+        )
+        prof_sequencer.spam_in_background(
+            plan,
+            fuzz_target,
+            mev_params.prof_sequencer_extra_args,
+            mev_params.prof_sequencer_seconds_per_bundle,
+            prof_contract_owner.private_key,
+            prof_normal_user.private_key,
         )
         mev_endpoints.append(endpoint)
         mev_endpoint_names.append(args_with_right_defaults.mev_type)
