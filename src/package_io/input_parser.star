@@ -366,6 +366,12 @@ def input_parser(plan, input_args):
             mev_flood_seconds_per_bundle=result["mev_params"][
                 "mev_flood_seconds_per_bundle"
             ],
+            #//prof_sequencer_image=result["mev_params"]["prof_sequencer_image"],
+            #//prof_sequencer_extra_args=result["mev_params"]["prof_sequencer_extra_args"],
+            #//prof_sequencer_seconds_per_bundle=result["mev_params"][
+            #//    "prof_sequencer_seconds_per_bundle"
+            #//],
+            mev_builder_type=result["mev_params"]["mev_builder_type"]
         )
         if result["mev_params"]
         else None,
@@ -383,12 +389,7 @@ def input_parser(plan, input_args):
             url=result["docker_cache_params"]["url"],
             dockerhub_prefix=result["docker_cache_params"]["dockerhub_prefix"],
             github_prefix=result["docker_cache_params"]["github_prefix"],
-            google_prefix=result["docker_cache_params"]["google_prefix"],
-            prof_sequencer_image=result["mev_params"]["prof_sequencer_image"],
-            prof_sequencer_extra_args=result["mev_params"]["prof_sequencer_extra_args"],
-            prof_sequencer_seconds_per_bundle=result["mev_params"][
-                "prof_sequencer_seconds_per_bundle"
-            ],
+            google_prefix=result["docker_cache_params"]["google_prefix"]
         ),
         tx_spammer_params=struct(
             image=result["tx_spammer_params"]["image"],
@@ -1037,6 +1038,7 @@ def get_default_docker_cache_params():
 def get_default_mev_params(mev_type, preset):
     mev_relay_image = constants.DEFAULT_FLASHBOTS_RELAY_IMAGE
     mev_builder_image = constants.DEFAULT_FLASHBOTS_BUILDER_IMAGE
+    mev_builder_type = constants.EL_TYPE.reth
     if preset == "minimal":
         mev_builder_cl_image = DEFAULT_CL_IMAGES_MINIMAL[constants.CL_TYPE.lighthouse]
     else:
@@ -1102,6 +1104,7 @@ def get_default_mev_params(mev_type, preset):
         "mev_flood_extra_args": mev_flood_extra_args,
         "mev_flood_seconds_per_bundle": mev_flood_seconds_per_bundle,
         "mev_builder_prometheus_config": mev_builder_prometheus_config,
+        "mev_builder_type": constants.EL_TYPE.reth,
     }
 
 
@@ -1289,7 +1292,10 @@ def enrich_mev_extra_params(parsed_arguments_dict, mev_prefix, mev_port, mev_typ
         or mev_type == constants.COMMIT_BOOST_MEV_TYPE
     ):
         mev_participant = default_participant()
-        mev_participant["el_type"] = "reth-builder"
+        if parsed_arguments_dict["mev_params"]["mev_builder_type"] == constants.EL_TYPE.geth:
+            mev_participant["el_type"] = "geth-builder"
+        else:
+            mev_participant["el_type"] = "reth-builder"
         mev_participant.update(
             {
                 "el_image": parsed_arguments_dict["mev_params"]["mev_builder_image"],

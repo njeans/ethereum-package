@@ -38,6 +38,18 @@ def launch(
             ),
             "launch_method": geth.launch,
         },
+        constants.EL_TYPE.geth_builder: {
+            "launcher": geth.new_geth_launcher(
+                el_cl_data,
+                jwt_file,
+                network_params.network,
+                network_id,
+                el_cl_data.prague_time,
+                builder_type=mev_builder_type,
+                mev_params=mev_params,
+            ),
+            "launch_method": geth.launch,
+        },
         constants.EL_TYPE.besu: {
             "launcher": besu.new_besu_launcher(
                 el_cl_data,

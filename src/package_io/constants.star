@@ -1,5 +1,6 @@
 EL_TYPE = struct(
     geth="geth",
+    geth_builder="geth-builder",
     erigon="erigon",
     nethermind="nethermind",
     besu="besu",
@@ -57,6 +58,7 @@ ENGINE_RPC_PORT_ID = "engine-rpc"
 ENGINE_WS_PORT_ID = "engine-ws"
 ADMIN_PORT_ID = "admin"
 RBUILDER_PORT_ID = "rbuilder-rpc"
+GBUILDER_PORT_ID = "gbuilder-rpc"
 LITTLE_BIGTABLE_PORT_ID = "littlebigtable"
 VALDIATOR_GRPC_PORT_ID = "grpc"
 
@@ -259,6 +261,7 @@ VOLUME_SIZE = {
     },
     "kurtosis": {
         "geth_volume_size": 5000,  # 5GB
+        "geth_builder_volume_size": 5000,  # 5GB
         "erigon_volume_size": 3000,  # 3GB
         "nethermind_volume_size": 3000,  # 3GB
         "besu_volume_size": 3000,  # 3GB

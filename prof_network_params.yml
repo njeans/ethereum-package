@@ -1,0 +1,32 @@
+participants:
+  - el_type: geth
+    el_log_level: "debug"
+    cl_type: lighthouse
+    count: 2
+mev_type: flashbots
+additional_services:
+  - tx_spammer
+  - blob_spammer
+network_params:
+  seconds_per_slot: 6
+wait_for_finalization: false
+mev_type: flashbots
+mev_params:
+  mev_builder_image: prof-project/builder-prof-merger
+  mev_builder_type: "geth"
+  prof_sequencer_image: prof-project/prof-sequeuncer
+  prof_sequencer_seconds_per_bundle: 1
+  prof_sequencer_extra_args: []
+  mev_relay_image: prof-project/prof-relay
+  mev_relay_api_extra_args: []
+  mev_relay_housekeeper_extra_args: []
+  mev_relay_website_extra_args: []
+  mev_builder_extra_args: []
+  mev_builder_prometheus_config:
+    scrape_interval: 15s
+    labels: {}
+  mev_flood_image: flashbots/mev-flood
+  mev_flood_extra_args: []
+  mev_flood_seconds_per_bundle: 15
+  mev_boost_image: flashbots/mev-boost
+  mev_boost_args: ["mev-boost", "--relay-check"]

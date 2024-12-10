@@ -2,6 +2,8 @@ shared_utils = import_module("../../shared_utils/shared_utils.star")
 input_parser = import_module("../../package_io/input_parser.star")
 el_context = import_module("../../el/el_context.star")
 el_admin_node_info = import_module("../../el/el_admin_node_info.star")
+lighthouse = import_module("../../cl/lighthouse/lighthouse_launcher.star")
+
 genesis_constants = import_module(
     "../../prelaunch_data_generator/genesis_constants/genesis_constants.star"
 )
@@ -14,6 +16,7 @@ WS_PORT_NUM = 8546
 DISCOVERY_PORT_NUM = 30303
 ENGINE_RPC_PORT_NUM = 8551
 METRICS_PORT_NUM = 9001
+GBUILDER_PORT_NUM = 8645
 
 # TODO(old) Scale this dynamically based on CPUs available and Geth nodes mining
 NUM_MINING_THREADS = 1
@@ -178,6 +181,14 @@ def get_config(
         constants.WS_PORT_ID: WS_PORT_NUM,
         constants.METRICS_PORT_ID: METRICS_PORT_NUM,
     }
+
+    if (
+        launcher.builder_type == constants.FLASHBOTS_MEV_TYPE
+        or launcher.builder_type == constants.COMMIT_BOOST_MEV_TYPE
+    ):
+        used_port_assignments[constants.GBUILDER_PORT_ID] = GBUILDER_PORT_NUM
+
+
     used_ports = shared_utils.get_port_specs(used_port_assignments)
 
     cmd = [
@@ -205,7 +216,12 @@ def get_config(
         "--http.corsdomain=*",
         # WARNING: The admin info endpoint is enabled so that we can easily get ENR/enode, which means
         #  that users should NOT store private information in these Kurtosis nodes!
-        "--http.api=admin,engine,net,eth,web3,debug",
+        "--http.api=admin,net,eth,web3,debug,txpool,trace{0}".format(
+            ",flashbots"
+            if launcher.builder_type == constants.FLASHBOTS_MEV_TYPE
+            or launcher.builder_type == constants.COMMIT_BOOST_MEV_TYPE
+            else ""
+        ),
         "--ws",
         "--ws.addr=0.0.0.0",
         "--ws.port={0}".format(WS_PORT_NUM),
@@ -299,7 +315,24 @@ def get_config(
                 constants.EL_TYPE.geth + "_volume_size"
             ],
         )
-    env_vars = participant.el_extra_env_vars
+    env_vars = {}
+    if (
+        launcher.builder_type == constants.FLASHBOTS_MEV_TYPE
+        or launcher.builder_type == constants.COMMIT_BOOST_MEV_TYPE
+    ):
+        image = launcher.mev_params.mev_builder_image
+        cl_client_name = service_name.split("-")[4]
+        env_vars.update(
+            {
+                "CL_ENDPOINT": "http://cl-{0}-{1}-{2}:{3}".format(
+                    participant_index + 1,
+                    cl_client_name,
+                    constants.EL_TYPE.geth_builder,
+                    lighthouse.BEACON_HTTP_PORT_NUM,
+                ),
+            }
+        )
+
     config_args = {
         "image": participant.el_image,
         "ports": used_ports,
@@ -308,7 +341,7 @@ def get_config(
         "files": files,
         "entrypoint": ENTRYPOINT_ARGS,
         "private_ip_address_placeholder": constants.PRIVATE_IP_ADDRESS_PLACEHOLDER,
-        "env_vars": env_vars,
+        "env_vars": env_vars | participant.el_extra_env_vars,
         "labels": shared_utils.label_maker(
             client=constants.EL_TYPE.geth,
             client_type=constants.CLIENT_TYPES.el,
@@ -338,6 +371,7 @@ def new_geth_launcher(
     network,
     networkid,
     prague_time,
+    builder_type=False, mev_params=None
 ):
     return struct(
         el_cl_genesis_data=el_cl_genesis_data,
@@ -345,4 +379,6 @@ def new_geth_launcher(
         network=network,
         networkid=networkid,
         prague_time=prague_time,
+        builder_type=builder_type,
+        mev_params=mev_params,
     )

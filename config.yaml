@@ -1,0 +1,18 @@
+participants:
+  - el_type: geth
+    cl_type: nimbus
+    # cl_extra_params: ["--light-client-data-serve=true"]
+    vc_type: nimbus
+    count: 1
+network_params:
+  preset: mainnet
+  network: kurtosis
+  network_id: "3151908"
+wait_for_finalization: false
+additional_services:
+  - tx_spammer
+  - blob_spammer
+  - el_forkmon
+persistent: true
+global_log_level: "debug"
+mev_type: flashbots

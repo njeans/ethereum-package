@@ -44,6 +44,9 @@ mev_rs_mev_builder = import_module(
 flashbots_mev_rbuilder = import_module(
     "./src/mev/flashbots/mev_builder/mev_builder_launcher.star"
 )
+flashbots_mev_gbuilder = import_module(
+    "./src/mev/flashbots/mev_builder/mev_builder_launcher_geth.star"
+)
 
 flashbots_mev_boost = import_module(
     "./src/mev/flashbots/mev_boost/mev_boost_launcher.star"
@@ -139,17 +142,30 @@ def run(plan, args={}):
         args_with_right_defaults.mev_type == constants.FLASHBOTS_MEV_TYPE
         or args_with_right_defaults.mev_type == constants.COMMIT_BOOST_MEV_TYPE
     ):
-        plan.print("Generating flashbots builder config file")
-        flashbots_builder_config_file = flashbots_mev_rbuilder.new_builder_config(
-            plan,
-            constants.FLASHBOTS_MEV_TYPE,
-            network_params,
-            constants.VALIDATING_REWARDS_ACCOUNT,
-            network_params.preregistered_validator_keys_mnemonic,
-            args_with_right_defaults.mev_params.mev_builder_extra_data,
-            enumerate(args_with_right_defaults.participants),
-            global_node_selectors,
-        )
+        if args_with_right_defaults.mev_params.mev_builder_type == constants.EL_TYPE.geth:
+            plan.print("Generating flashbots geth builder config file")
+            flashbots_builder_config_file = flashbots_mev_gbuilder.new_builder_config(
+                plan,
+                constants.FLASHBOTS_MEV_TYPE,
+                network_params,
+                constants.VALIDATING_REWARDS_ACCOUNT,
+                network_params.preregistered_validator_keys_mnemonic,
+                args_with_right_defaults.mev_params.mev_builder_extra_data,
+                enumerate(args_with_right_defaults.participants),
+                global_node_selectors,
+            )
+        else:
+            plan.print("Generating flashbots builder config file")
+            flashbots_builder_config_file = flashbots_mev_rbuilder.new_builder_config(
+                plan,
+                constants.FLASHBOTS_MEV_TYPE,
+                network_params,
+                constants.VALIDATING_REWARDS_ACCOUNT,
+                network_params.preregistered_validator_keys_mnemonic,
+                args_with_right_defaults.mev_params.mev_builder_extra_data,
+                enumerate(args_with_right_defaults.participants),
+                global_node_selectors,
+            )
 
     plan.print(
         "Launching participant network with {0} participants and the following network params {1}".format(
@@ -285,15 +301,15 @@ def run(plan, args={}):
             normal_user.private_key,
             global_node_selectors,
         )
-        prof_contract_owner, prof_normal_user = genesis_constants.PRE_FUNDED_ACCOUNTS[8:10]
-        prof_sequencer.launch_prof_sequencer(
-            plan,
-            mev_params.prof_sequencer_image,
-            fuzz_target,
-            prof_contract_owner.private_key,
-            prof_normal_user.private_key,
-            global_node_selectors,
-        )
+        #prof_contract_owner, prof_normal_user = genesis_constants.PRE_FUNDED_ACCOUNTS[8:10]
+        #prof_sequencer.launch_prof_sequencer(
+        #    plan,
+        #    mev_params.prof_sequencer_image,
+        #    fuzz_target,
+        #    prof_contract_owner.private_key,
+        #    prof_normal_user.private_key,
+        #    global_node_selectors,
+        #)
         epoch_recipe = GetHttpRequestRecipe(
             endpoint="/eth/v2/beacon/blocks/head",
             port_id=HTTP_PORT_ID_FOR_FACT,
@@ -342,14 +358,14 @@ def run(plan, args={}):
             contract_owner.private_key,
             normal_user.private_key,
         )
-        prof_sequencer.spam_in_background(
-            plan,
-            fuzz_target,
-            mev_params.prof_sequencer_extra_args,
-            mev_params.prof_sequencer_seconds_per_bundle,
-            prof_contract_owner.private_key,
-            prof_normal_user.private_key,
-        )
+        #prof_sequencer.spam_in_background(
+        #    plan,
+        #    fuzz_target,
+        #    mev_params.prof_sequencer_extra_args,
+        #    mev_params.prof_sequencer_seconds_per_bundle,
+        #    prof_contract_owner.private_key,
+        #    prof_normal_user.private_key,
+        #)
         mev_endpoints.append(endpoint)
         mev_endpoint_names.append(args_with_right_defaults.mev_type)
 
