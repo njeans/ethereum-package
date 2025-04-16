@@ -6,13 +6,13 @@ fi
 
 echo "Running with SGX environment"
 cat .env
-echo 
-echo 
+echo
+echo
 
 docker compose -f docker-compose.yml down
 kurtosis enclave rm -f prof-testnet
 cd ..
-kurtosis run --enclave prof-testnet --args-file gramine-builder/network_params.yaml . "{}" &
+kurtosis run --enclave prof-testnet --args-file gramine-builder/network_params.yaml --image-download always . "{}" &
 PID=$!
 echo "Kurtosis PID" $PID
 
